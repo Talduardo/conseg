@@ -47,56 +47,26 @@ body {
   overflow-x: hidden;
 }
 
-/* ─── Fundo — veículo minimalista em movimento contínuo ─────────────
-     Silhueta de carro em traço único (mesma linguagem do ícone da
-     marca), atravessando a tela em loop, sobre fundo sólido —
-     sem gradientes de cor.                                          */
-.vehicle-stage {
+/* ─── Fundo — vídeo em tela cheia ────────────────────────────────── */
+.video-stage {
   position: fixed; inset: 0; z-index: -1;
   overflow: hidden;
   background: var(--bg-a);
   pointer-events: none;
 }
 
-.road-line {
+.video-stage video {
   position: absolute;
-  bottom: 30%;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-image: repeating-linear-gradient(90deg,
-    var(--primary) 0, var(--primary) 34px, transparent 34px, transparent 74px);
-  opacity: .22;
-  background-size: 74px 2px;
-  animation: road-scroll 1.6s linear infinite;
+  top: 50%; left: 50%;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
 }
 
-@keyframes road-scroll {
-  to { background-position: -74px 0; }
-}
-
-.car-track {
-  position: absolute;
-  bottom: calc(30% - 40px);
-  left: -280px;
-  width: 240px;
-  animation: drive-by 15s linear infinite;
-}
-
-@keyframes drive-by {
-  from { left: -280px; }
-  to   { left: 100%; }
-}
-
-.car-track .car-body   { fill: var(--dark-navy); }
-.car-track .car-roof   { fill: none; stroke: var(--primary); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
-.car-track .car-window { fill: var(--bg-a); }
-.car-track .headlight  { fill: var(--primary-light); opacity: .85; }
-.car-track .wheel      { fill: var(--bg-a); stroke: var(--primary); stroke-width: 3; }
-.car-track .wheel-spin { transform-origin: center; animation: wheel-spin .55s linear infinite; }
-
-@keyframes wheel-spin {
-  to { transform: rotate(360deg); }
+/* Véu sólido — mantém contraste do texto sobre o vídeo, sem gradiente */
+.video-veil {
+  position: absolute; inset: 0;
+  background: rgba(11, 15, 43, .58);
 }
 
 /* ─── Estrutura principal ─────────────────────────────────────────── */
@@ -265,8 +235,6 @@ footer p {
 /* ─── Acessibilidade — movimento reduzido ────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .team-card, .contact-btn { transition: none !important; }
-  .road-line, .car-track, .wheel-spin { animation: none !important; }
-  .car-track { left: 8%; }
 }
 
 /* ─── Ajuste fino mobile ──────────────────────────────────────────── */
@@ -280,31 +248,21 @@ footer p {
 
 <body>
 
-<div class="vehicle-stage" aria-hidden="true">
-  <div class="road-line"></div>
-  <svg class="car-track" viewBox="0 0 240 100" width="240" height="100">
-    <ellipse class="wheel" cx="70"  cy="76" r="15"/>
-    <ellipse class="wheel" cx="172" cy="76" r="15"/>
-    <g class="wheel-spin" style="transform-box: fill-box; transform-origin: 70px 76px;">
-      <line x1="70" y1="64" x2="70" y2="88" stroke="var(--primary)" stroke-width="2"/>
-      <line x1="58" y1="76" x2="82" y2="76" stroke="var(--primary)" stroke-width="2"/>
-    </g>
-    <g class="wheel-spin" style="transform-box: fill-box; transform-origin: 172px 76px;">
-      <line x1="172" y1="64" x2="172" y2="88" stroke="var(--primary)" stroke-width="2"/>
-      <line x1="160" y1="76" x2="184" y2="76" stroke="var(--primary)" stroke-width="2"/>
-    </g>
-    <path class="car-body"
-          d="M14,72 C14,60 24,58 40,58 L60,58 L78,38 C86,30 98,26 112,26 L150,26
-             C166,26 180,32 190,44 L204,58 L216,58 C224,58 228,64 228,72
-             C228,78 224,82 216,82 L26,82 C18,82 14,78 14,72 Z"/>
-    <path class="car-window"
-          d="M84,55 L96,38 C102,32 110,29 120,29 L146,29
-             C156,29 165,33 172,41 L184,55 Z"/>
-    <path class="car-roof"
-          d="M78,38 C86,30 98,26 112,26 L150,26 C166,26 180,32 190,44 L204,58"/>
-    <circle class="headlight" cx="222" cy="66" r="4"/>
-  </svg>
+<div class="video-stage" aria-hidden="true">
+  <video autoplay muted loop playsinline preload="auto" poster="cena-conseg-poster.jpg">
+    <source src="cena-conseg.mp4" type="video/mp4"/>
+  </video>
+  <div class="video-veil"></div>
 </div>
+
+<script>
+  // Respeita a preferência de movimento reduzido: pausa o vídeo e mantém apenas o poster.
+  (function () {
+    var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var vid = document.querySelector('.video-stage video');
+    if (mq.matches && vid) vid.pause();
+  })();
+</script>
 
 <main>
 
